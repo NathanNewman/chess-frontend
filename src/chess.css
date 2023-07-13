@@ -1,0 +1,9 @@
+.chess-background {
+  background-image: url("../public/chess-background.jpg");
+  background-size: cover;
+  min-height: 100vh;
+}
+
+.card-container {
+  margin-top: 20px;
+}
