@@ -1,28 +1,52 @@
-import React, { useContext } from "react";
+import React from "react";
 import { BrowserRouter, Route, Redirect } from "react-router-dom";
 import MyNavbar from "./Navbar";
 import Home from "./Home";
 import SignUpForm from "./SignUpForm";
 import LoginForm from "./LoginForm";
-import { AuthContext } from "./helpers/AuthContext";
+import LeaderBoard from "./LeaderBoard";
+import Replays from "./Replays";
+import ReplayMatch from "./game/ReplayMatch"
 
 function App() {
-  const { username } = useContext(AuthContext);
   return (
     <BrowserRouter>
       <MyNavbar />
       <main>
         <Route exact path="/">
-          {username ? <Home /> : <Redirect to="/login" />}
+          {localStorage.getItem("username") ? (
+            <Home />
+          ) : (
+            <Redirect to="/login" />
+          )}
         </Route>
         <Route exact path="/play">
-          {username ? <Home /> : <Redirect to="/login" />}
+          {localStorage.getItem("username") ? (
+            <Home />
+          ) : (
+            <Redirect to="/login" />
+          )}
         </Route>
         <Route exact path="/leaderboard">
-          {username ? <Home /> : <Redirect to="/login" />}
+          {localStorage.getItem("username") ? (
+            <LeaderBoard />
+          ) : (
+            <Redirect to="/login" />
+          )}
         </Route>
         <Route exact path="/replays">
-          {username ? <Home /> : <Redirect to="/login" />}
+          {localStorage.getItem("username") ? (
+            <Replays />
+          ) : (
+            <Redirect to="/login" />
+          )}
+        </Route>
+        <Route exact path="/replays/:matchId">
+          {localStorage.getItem("username") ? (
+            <ReplayMatch />
+          ) : (
+            <Redirect to="/login" />
+          )}
         </Route>
         <Route exact path="/signup">
           <SignUpForm />

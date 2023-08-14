@@ -43,12 +43,12 @@ function MyNavbar() {
                   Play
                 </>
               ) : (
-                <>
-                  <Tooltip title="Login to access">
-                    <FaChessPawn size={22} />
-                    Play
-                  </Tooltip>
-                </>
+                <Tooltip title="Login to access">
+                  <span>
+                  <FaChessPawn size={22} />
+                  Play
+                  </span>
+                </Tooltip>
               )}
             </NavLink>
           </NavItem>
@@ -59,11 +59,11 @@ function MyNavbar() {
                   <FaTrophy size={22} /> Leaderboard
                 </>
               ) : (
-                <>
-                  <Tooltip title="Login to access">
-                    <FaTrophy size={22} /> Leaderboard
-                  </Tooltip>
-                </>
+                <Tooltip title="Login to access">
+                  <span>
+                  <FaTrophy size={22} /> Leaderboard
+                  </span>
+                </Tooltip>
               )}
             </NavLink>
           </NavItem>
@@ -74,11 +74,11 @@ function MyNavbar() {
                   <MdReplayCircleFilled size={22} /> Replays
                 </>
               ) : (
-                <>
                   <Tooltip title="Login to access">
+                    <span>
                     <MdReplayCircleFilled size={22} /> Replays
+                    </span>
                   </Tooltip>
-                </>
               )}
             </NavLink>
           </NavItem>

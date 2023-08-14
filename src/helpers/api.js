@@ -36,13 +36,13 @@ class ChessApi {
       this.login(
         response.token,
         response.user.username,
-        response.user.imageURL
+        response.user.imageURL,
+        response.user.elo
       );
       return response;
     } catch (error) {
-      console.error("API Error:", error.response);
-      let message = error.data.error.message;
-      throw Array.isArray(message) ? message : [message];
+      console.error("API Error:", error);
+      throw error;
     }
   }
 
@@ -59,7 +59,8 @@ class ChessApi {
       this.login(
         response.token,
         response.user.username,
-        response.user.imageURL
+        response.user.imageURL,
+        response.user.elo
       );
       return response;
     } catch (error) {
@@ -73,9 +74,8 @@ class ChessApi {
       const response = await this.request(`users/${username}`, {}, "get");
       return response;
     } catch (error) {
-      console.error("API Error:", error.response);
-      let message = error.response.data.error.message;
-      throw Array.isArray(message) ? message : [message];
+      console.error("API Error:", error);
+      throw error;
     }
   }
 
@@ -90,9 +90,8 @@ class ChessApi {
       );
       return response;
     } catch (error) {
-      console.error("API Error:", error.response);
-      let message = error.response.data.error.message;
-      throw Array.isArray(message) ? message : [message];
+      console.error("API Error:", error);
+      throw error;
     }
   }
 
@@ -101,16 +100,16 @@ class ChessApi {
       const response = await this.request(`users/${username}`, {}, "delete");
       return response;
     } catch (error) {
-      console.error("API Error:", error.response);
-      let message = error.response.data.error.message;
-      throw Array.isArray(message) ? message : [message];
+      console.error("API Error:", error);
+      throw error;
     }
   }
 
-  static login(token, username, imageURL) {
+  static login(token, username, imageURL, elo) {
     localStorage.setItem("authenticated", token);
     localStorage.setItem("username", username);
     localStorage.setItem("imageURL", imageURL);
+    localStorage.setItem("elo", elo);
     this.token = token;
     return token;
   }
@@ -119,6 +118,63 @@ class ChessApi {
     localStorage.removeItem("authenticated");
     localStorage.removeItem("username");
     localStorage.removeItem("imageURL");
+  }
+
+  static async recordGame(username, result, elo, moves, userColor) {
+    try {
+      let response = await this.request(
+        "game/record",
+        {
+          username: username,
+          result: result,
+          elo: elo,
+          moves: moves,
+          userColor: userColor,
+        },
+        "post"
+      );
+      return response.user;
+    } catch (error) {
+      console.error("API Error:", error);
+      throw error;
+    }
+  }
+  static async replayGame(matchId) {
+    try {
+      const response = await this.request(`game/replay/${matchId}`, {}, "get");
+      return response;
+    } catch (error) {
+      console.error("API Error:", error);
+      throw error;
+    }
+  }
+  static async getMatches(username) {
+    try {
+      const response = await this.request(
+        `game/matches/${username}`,
+        {},
+        "get"
+      );
+      return response;
+    } catch (error) {
+      console.error("API Error:", error);
+      throw error;
+    }
+  }
+  static async userProfile(username) {
+    const user = await this.getUser(username);
+    const matches = await this.getMatches(username);
+    user.matches = matches;
+    return user;
+  }
+  static async getLeaders() {
+    try {
+      const leaders = await this.request("users/leaderboard", {}, "get");
+      return leaders;
+    } catch (error) {
+      console.error("API Error:", error);
+      throw error;
+    }
   }
 }
 

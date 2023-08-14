@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { AuthContext } from "./helpers/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import {
   Container,
   Row,
@@ -15,6 +15,7 @@ import {
 } from "reactstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaUserPlus } from "react-icons/fa";
+import { Tooltip } from "@mui/material";
 import ChessApi from "./helpers/api";
 import "./chess.css";
 
@@ -29,6 +30,7 @@ function LoginForm() {
   const [passwordError, setPasswordError] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const [serverError, setServerError] = useState(false);
+  const history = useHistory();
 
   const handleChange = (evt) => {
     const { name, value } = evt.target;
@@ -53,6 +55,10 @@ function LoginForm() {
           setAuthenticated(response.token);
           setUsername(response.user.username);
           setImageURL(response.user.imageURL);
+          // Add a small delay before redirecting
+          setTimeout(() => {
+            history.push("/");
+          }, 1000); // Adjust the delay time as needed
         }
       } catch (error) {
         console.error("Error during authentication:", error);
@@ -99,21 +105,24 @@ function LoginForm() {
                         ))}
                       </div>
                     )}
-
                     {serverError && (
                       <div style={{ color: "red" }}>
                         Unable to connect to the server. Please try again later.
                       </div>
                     )}
                     <FormGroup>
-                      <Label for="username">Username</Label>
-                      <Input
-                        type="text"
-                        id="username"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleChange}
-                      />
+                      <Tooltip title="Must be between 4 and 20 characters">
+                        <span>
+                          <Label for="username">Username:</Label>
+                          <Input
+                            type="text"
+                            id="username"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                          />
+                        </span>
+                      </Tooltip>
                       {usernameError && (
                         <div style={{ color: "red" }}>
                           Username must be between 4-20 characters long
@@ -121,14 +130,18 @@ function LoginForm() {
                       )}
                     </FormGroup>
                     <FormGroup>
-                      <Label for="password">Password</Label>
-                      <Input
-                        type="password"
-                        id="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                      />
+                      <Tooltip title="Must be between 8 and 20 characters">
+                        <span>
+                          <Label for="password">Password:</Label>
+                          <Input
+                            type="password"
+                            id="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                          />
+                        </span>
+                      </Tooltip>
                       {passwordError && (
                         <div style={{ color: "red" }}>
                           Password must be between 8-20 characters long

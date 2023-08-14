@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { AuthContext } from "./helpers/AuthContext";
+import { useHistory } from "react-router-dom";
 import {
   Container,
   Row,
@@ -12,6 +13,7 @@ import {
   Card,
   CardBody,
 } from "reactstrap";
+import { Tooltip } from "@mui/material";
 import ChessApi from "./helpers/api";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./chess.css";
@@ -23,12 +25,15 @@ function SignUpForm() {
     repeatPassword: "",
     imageURL: "",
   });
-  const { setAuthenticated } = useContext(AuthContext);
+  const { setAuthenticated, setUsername, setImageURL } =
+    useContext(AuthContext);
   const [usernameError, setUsernameError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [repeatPasswordError, setRepeatPasswordError] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [loginError, setLoginError] = useState(false);
+  const [serverError, setServerError] = useState(false);
+  const history = useHistory();
 
   const handleChange = (evt) => {
     const { name, value } = evt.target;
@@ -53,6 +58,7 @@ function SignUpForm() {
     evt.preventDefault();
     const hasErrors = checkSubmissionErrors();
     if (!hasErrors) {
+      setServerError(false);
       try {
         const response = await ChessApi.createUser(
           formData.username,
@@ -62,12 +68,17 @@ function SignUpForm() {
         if (response.token) {
           setLoginError(false);
           setAuthenticated(response.token);
-        } else {
-          setLoginError(true);
+          setUsername(response.user.username);
+          setImageURL(response.user.imageURL);
+          history.push("/");
         }
       } catch (error) {
         console.error("Error during authentication:", error);
-        setLoginError(true);
+        if (error[0]) {
+          setLoginError(error);
+        } else {
+          setServerError(true);
+        }
       }
     }
     setFormData({
@@ -116,20 +127,31 @@ function SignUpForm() {
                 <CardBody>
                   <h1>Sign Up</h1>
                   <Form onSubmit={handleSubmit}>
-                    {loginError && (
+                    {loginError && !serverError && (
                       <div style={{ color: "red" }}>
-                        Username already taken!
+                        {loginError.map((error, index) => (
+                          <div key={index}>{error}</div>
+                        ))}
+                      </div>
+                    )}
+                    {serverError && (
+                      <div style={{ color: "red" }}>
+                        Unable to connect to the server. Please try again later.
                       </div>
                     )}
                     <FormGroup>
-                      <Label for="username">Username</Label>
-                      <Input
-                        type="text"
-                        id="username"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleChange}
-                      />
+                      <Tooltip title="Must be between 4 and 20 characters">
+                        <span>
+                          <Label for="username">Username:</Label>
+                          <Input
+                            type="text"
+                            id="username"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                          />
+                        </span>
+                      </Tooltip>
                       {usernameError && (
                         <div style={{ color: "red" }}>
                           Username must be between 4-20 characters long
@@ -137,14 +159,18 @@ function SignUpForm() {
                       )}
                     </FormGroup>
                     <FormGroup>
-                      <Label for="password">Password</Label>
-                      <Input
-                        type="password"
-                        id="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                      />
+                      <Tooltip title="Must be between 8 and 20 characters">
+                        <span>
+                          <Label for="password">Password:</Label>
+                          <Input
+                            type="password"
+                            id="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                          />
+                        </span>
+                      </Tooltip>
                       {passwordError && (
                         <div style={{ color: "red" }}>
                           Password must be between 8-20 characters long
@@ -152,15 +178,18 @@ function SignUpForm() {
                       )}
                     </FormGroup>
                     <FormGroup>
-                      <Label for="repeatPassword">Repeat Password</Label>
-                      <Input
-                        type="password"
-                        id="repeatPassword"
-                        name="repeatPassword"
-                        value={formData.repeatPassword}
-                        onChange={handleChange}
-                        className={repeatPasswordError ? "is-invalid" : ""}
-                      />
+                      <Tooltip title="Must be the same as above password">
+                        <span>
+                          <Label for="repeatPassword">Repeat Password:</Label>
+                          <Input
+                            type="password"
+                            id="repeatPassword"
+                            name="repeatPassword"
+                            value={formData.repeatPassword}
+                            onChange={handleChange}
+                          />
+                        </span>
+                      </Tooltip>
                       {repeatPasswordError && (
                         <div style={{ color: "red" }}>
                           Passwords do not match
@@ -168,14 +197,18 @@ function SignUpForm() {
                       )}
                     </FormGroup>
                     <FormGroup>
-                      <Label for="imageURL">Image URL (optional)</Label>
-                      <Input
-                        type="text"
-                        id="imageURL"
-                        name="imageURL"
-                        value={formData.imageURL}
-                        onChange={handleChange}
-                      />
+                      <Tooltip title="Must remain blank if not a valid image URL">
+                        <span>
+                          <Label for="imageURL">Image URL (optional):</Label>
+                          <Input
+                            type="text"
+                            id="imageURL"
+                            name="imageURL"
+                            value={formData.imageURL}
+                            onChange={handleChange}
+                          />
+                        </span>
+                      </Tooltip>
                       {imageError && (
                         <div style={{ color: "red" }}>
                           Invalid image URL. Please enter a valid URL.
