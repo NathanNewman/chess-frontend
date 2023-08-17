@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { BrowserRouter, Route, Redirect } from "react-router-dom";
 import MyNavbar from "./Navbar";
 import Home from "./Home";
@@ -6,44 +6,54 @@ import SignUpForm from "./SignUpForm";
 import LoginForm from "./LoginForm";
 import LeaderBoard from "./LeaderBoard";
 import Replays from "./Replays";
-import ReplayMatch from "./game/ReplayMatch"
+import ReplayMatch from "./game/ReplayMatch";
+import Profile from "./Profile";
+import { AuthContext } from "./helpers/AuthContext";
 
 function App() {
+  const { authenticated } = useContext(AuthContext);
   return (
     <BrowserRouter>
       <MyNavbar />
       <main>
         <Route exact path="/">
-          {localStorage.getItem("username") ? (
+          {authenticated || localStorage.getItem("authenticated") ? (
             <Home />
           ) : (
             <Redirect to="/login" />
           )}
         </Route>
         <Route exact path="/play">
-          {localStorage.getItem("username") ? (
+          {authenticated || localStorage.getItem("authenticated") ? (
             <Home />
           ) : (
             <Redirect to="/login" />
           )}
         </Route>
         <Route exact path="/leaderboard">
-          {localStorage.getItem("username") ? (
+          {authenticated || localStorage.getItem("authenticated") ? (
             <LeaderBoard />
           ) : (
             <Redirect to="/login" />
           )}
         </Route>
         <Route exact path="/replays">
-          {localStorage.getItem("username") ? (
+          {authenticated || localStorage.getItem("authenticated") ? (
             <Replays />
           ) : (
             <Redirect to="/login" />
           )}
         </Route>
         <Route exact path="/replays/:matchId">
-          {localStorage.getItem("username") ? (
+          {authenticated || localStorage.getItem("authenticated") ? (
             <ReplayMatch />
+          ) : (
+            <Redirect to="/login" />
+          )}
+        </Route>
+        <Route exact path="/profile/:username">
+          {authenticated || localStorage.getItem("authenticated") ? (
+            <Profile />
           ) : (
             <Redirect to="/login" />
           )}

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "./helpers/AuthContext";
 import { useHistory } from "react-router-dom";
 import {
@@ -23,16 +23,15 @@ function SignUpForm() {
     username: "",
     password: "",
     repeatPassword: "",
-    imageURL: "",
   });
-  const { setAuthenticated, setUsername, setImageURL } =
+  const { setAuthenticated, username, setUsername } =
     useContext(AuthContext);
   const [usernameError, setUsernameError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [repeatPasswordError, setRepeatPasswordError] = useState(false);
-  const [imageError, setImageError] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const [serverError, setServerError] = useState(false);
+  const [redirect, setRedirect] = useState(false);
   const history = useHistory();
 
   const handleChange = (evt) => {
@@ -43,17 +42,6 @@ function SignUpForm() {
     }));
   };
 
-  function validateImageURL(url) {
-    const img = new Image();
-    img.onload = () => {
-      setImageError(false);
-    };
-    img.onerror = () => {
-      setImageError(true);
-    };
-    img.src = url;
-  }
-
   const handleSubmit = async (evt) => {
     evt.preventDefault();
     const hasErrors = checkSubmissionErrors();
@@ -63,14 +51,12 @@ function SignUpForm() {
         const response = await ChessApi.createUser(
           formData.username,
           formData.password,
-          formData.imageURL
         );
         if (response.token) {
           setLoginError(false);
+          setRedirect(true);
           setAuthenticated(response.token);
           setUsername(response.user.username);
-          setImageURL(response.user.imageURL);
-          history.push("/");
         }
       } catch (error) {
         console.error("Error during authentication:", error);
@@ -85,7 +71,6 @@ function SignUpForm() {
       username: "",
       password: "",
       repeatPassword: "",
-      imageURL: "",
     });
   };
 
@@ -103,20 +88,19 @@ function SignUpForm() {
       setRepeatPasswordError(true);
       error = true;
     }
-    if (formData.imageURL) {
-      validateImageURL(formData.imageURL);
-      if (imageError) {
-        setImageError(true);
-        error = true;
-      }
-    }
     if (error) return;
 
     setUsernameError(false);
     setPasswordError(false);
     setRepeatPasswordError(false);
-    setImageError(false);
   }
+
+  useEffect(() => {
+    if (redirect) {
+      history.push("/");
+    }
+  }, [username]);
+
   return (
     <div className="chess-background">
       <Container>
@@ -193,25 +177,6 @@ function SignUpForm() {
                       {repeatPasswordError && (
                         <div style={{ color: "red" }}>
                           Passwords do not match
-                        </div>
-                      )}
-                    </FormGroup>
-                    <FormGroup>
-                      <Tooltip title="Must remain blank if not a valid image URL">
-                        <span>
-                          <Label for="imageURL">Image URL (optional):</Label>
-                          <Input
-                            type="text"
-                            id="imageURL"
-                            name="imageURL"
-                            value={formData.imageURL}
-                            onChange={handleChange}
-                          />
-                        </span>
-                      </Tooltip>
-                      {imageError && (
-                        <div style={{ color: "red" }}>
-                          Invalid image URL. Please enter a valid URL.
                         </div>
                       )}
                     </FormGroup>

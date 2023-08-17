@@ -1,5 +1,5 @@
 export function toAlgebraicNotation(row, col) {
-  const cols = ["a", "b", "c", "d", "e", "f", "g", "h"];
+  const cols = ["h", "g", "f", "e", "d", "c", "b", "a"];
   const rows = ["8", "7", "6", "5", "4", "3", "2", "1"];
   return cols[col] + rows[row];
 }
@@ -97,15 +97,15 @@ export function findMissingPieces(board) {
 }
 
 export function adjustDifficulty(elo) {
-  if(elo < 500) return '1';
-  if(elo < 1000) return '2';
-  if(elo < 1250) return '3';
-  if(elo < 1500) return '4';
-  if(elo < 1750) return '5';
-  if(elo < 2000) return '6';
-  if(elo < 2075) return '7';
-  if(elo < 2150) return '8';
-  if(elo < 2225) return '9';
+  if(elo < 500) return '01';
+  if(elo < 1000) return '02';
+  if(elo < 1250) return '03';
+  if(elo < 1500) return '04';
+  if(elo < 1750) return '05';
+  if(elo < 2000) return '06';
+  if(elo < 2075) return '07';
+  if(elo < 2150) return '08';
+  if(elo < 2225) return '09';
   if(elo < 2300) return '10';
   if(elo < 2375) return '11';
   if(elo < 2450) return '12';
@@ -117,4 +117,28 @@ export function adjustDifficulty(elo) {
   if(elo < 2750) return '18';
   if(elo < 2800) return '19';
   return '20';
+}
+
+export function totalMissingPieces(object) {
+  const total = Object.values(object).reduce((sum, value) => sum + value, 0);
+  return total;
+}
+
+export function translateAlgebraicNotation(notation) {
+  const algebraicColumn = ["h", "g", "f", "e", "d", "c", "b", "a"];
+  const algebraicRow = ["8", "7", "6", "5", "4", "3", "2", "1"];
+
+  if (notation.length !== 2) {
+    throw new Error("Invalid notation format. It should be in the form of 'e2'.");
+  }
+
+  const [ column, row ] = notation.split("");
+  const columnIndex = algebraicColumn.indexOf(column);
+  const rowIndex = algebraicRow.indexOf(row);
+
+  if (columnIndex === -1 || rowIndex === -1) {
+    throw new Error("Invalid column or row in notation.");
+  }
+
+  return { col : columnIndex, row : rowIndex };
 }

@@ -6,6 +6,7 @@ import {
   addConsecutiveNumbers,
   findMissingPieces,
   adjustDifficulty,
+  totalMissingPieces,
 } from "../helpers/chess.js";
 import { Chess } from "chess.js";
 import { AuthContext } from "../helpers/AuthContext";
@@ -24,12 +25,11 @@ function ChessGame() {
   const [board, setBoard] = useState([]);
 
   // FEN states
-  const [piecePlacement, setPiecePlacement] = useState("");
   const [activeColor, setActiveColor] = useState("");
   const [castlingAvailability, setCastlingAvailability] = useState("");
   const [enPassantTarget, setEnPassantTarget] = useState("");
-  const [halfmoveClock, setHalfmoveClock] = useState("");
-  const [fullmoveNumber, setFullmoveNumber] = useState("");
+  const [halfmoveClock, setHalfmoveClock] = useState(0);
+  const [fullmoveNumber, setFullmoveNumber] = useState(0);
 
   // Game states
   const [playerColor, setPlayerColor] = useState("white");
@@ -43,6 +43,7 @@ function ChessGame() {
   const [endingMessage, setEndingMessage] = useState("");
   const [difficulty, setDifficulty] = useState("1");
   const aiColor = playerColor === "white" ? "black" : "white";
+  const [gameResult, setGameResult] = useState("");
 
   // Function to parse the FEN string and convert it to a 2D array representing the board state
   function parseFEN(fen) {
@@ -53,7 +54,6 @@ function ChessGame() {
     const enPassant = castlingEnPassant.slice(2, 4);
 
     // set FEN states
-    setPiecePlacement(position);
     setActiveColor(color);
     setCastlingAvailability(castling);
     setEnPassantTarget(enPassant);
@@ -171,11 +171,7 @@ function ChessGame() {
         to: toSquare,
         promotion: "q", // Always promote to a queen for simplicity
       };
-      // Add the move to the move history using the functional update form of setMoveHistory
-      setMoveHistory((prevMoveHistory) => [
-        ...prevMoveHistory,
-        move.from + move.to,
-      ]);
+
       // If the moved piece is a pawn and it reached the last rank, set the promotion piece
       if (
         chess.get(fromSquare.row, fromSquare.col).type === "p" &&
@@ -191,35 +187,56 @@ function ChessGame() {
       }
       // Check if the move is valid using chess.js move validation
       chess.move(move);
+
       const updatedBoard = parseFEN(chess.fen()); // Get the updated FEN
       setBoard(updatedBoard); // Update the board state
-      if (findMissingPieces(updatedBoard) !== piecesTaken) {
+
+      // updated missing pieces and half move clock
+      if (
+        totalMissingPieces(findMissingPieces(updatedBoard)) !==
+          totalMissingPieces(piecesTaken) &&
+        Object.keys(findMissingPieces(updatedBoard)).length !== 0
+      ) {
         setPiecesTaken(findMissingPieces(updatedBoard));
         setHalfmoveClock(0);
       }
+
+      // check for end game conditions
       if (chess.isCheckmate()) {
         if (playerColor[0] === activeColor) {
           setEndingMessage("Checkmate! You win!");
-          handleEndGame("checkmate win");
+
+          setGameOver(true);
+          setGameResult("checkmate win");
         } else {
           setEndingMessage("Checkmate! You lose!");
-          handleEndGame("checkmate loss");
+          setGameOver(true);
+          setGameResult("checkmate loss");
         }
       } else if (chess.isStalemate()) {
         if (playerColor[0] === activeColor) {
           setEndingMessage("Stalemate! You win!");
-          handleEndGame("stalemate win");
+          setGameOver(true);
+          setGameResult("statemate win");
         } else {
           setEndingMessage("Stalemate! You lose!");
-          handleEndGame("stalemate loss");
+          setGameOver(true);
+          setGameResult("statemate loss");
         }
       } else if (halfmoveClock === 50) {
         setEndingMessage("Draw! Game over.");
-        handleEndGame("draw");
+        setGameOver(true);
+        setGameResult("draw");
       } else if (chess.isCheck()) {
         setErrorMessage("Check!");
         setTimeout(() => setErrorMessage(""), 5000);
       }
+
+      // Add the move to the move history using the functional update form of setMoveHistory
+      setMoveHistory((prevMoveHistory) => [
+        ...prevMoveHistory,
+        move.from + move.to,
+      ]);
     } catch (error) {
       // Handle any errors that occur during move validation
       console.error("Error occurred during move validation:", error);
@@ -232,11 +249,22 @@ function ChessGame() {
     setPrevClickedSquare(null);
   }
 
-  async function handleEndGame(result) {
-    const user = await ChessApi.recordGame(username, result, elo, moveHistory, playerColor);
-    setElo(user.elo);
-    setGameOver(true);
-  }
+  useEffect(() => {
+    if (gameOver) {
+      async function handleEndGame() { 
+        const user = await ChessApi.recordGame(
+          username,
+          gameResult,
+          elo.toString(),
+          moveHistory,
+          playerColor
+        );
+        console.log(user);
+        setElo(user.elo);
+      }
+      handleEndGame();
+    }
+  }, [moveHistory]);
 
   function handlePlayAgain() {
     // Reset the game state and close the modal
@@ -264,6 +292,8 @@ function ChessGame() {
     setPlayerColor(getRandomBoolean() ? "white" : "black");
     const depth = adjustDifficulty(elo);
     setDifficulty(depth);
+    const storedElo = localStorage.getItem("elo");
+    setElo(parseInt(storedElo));
 
     // Initialize Stockfish
     const stockfish = new Worker("/stockfish/stockfish.js");

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "./helpers/AuthContext";
 import { Link, useHistory } from "react-router-dom";
 import {
@@ -24,12 +24,13 @@ function LoginForm() {
     username: "",
     password: "",
   });
-  const { setAuthenticated, setUsername, setImageURL } =
+  const { setAuthenticated, username, setUsername, setElo } =
     useContext(AuthContext);
   const [usernameError, setUsernameError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const [serverError, setServerError] = useState(false);
+  const [redirect, setRedirect ] = useState(false);
   const history = useHistory();
 
   const handleChange = (evt) => {
@@ -53,12 +54,9 @@ function LoginForm() {
         if (response.token) {
           setLoginError(false);
           setAuthenticated(response.token);
+          setRedirect(true);
+          setElo(response.user.elo);
           setUsername(response.user.username);
-          setImageURL(response.user.imageURL);
-          // Add a small delay before redirecting
-          setTimeout(() => {
-            history.push("/");
-          }, 1000); // Adjust the delay time as needed
         }
       } catch (error) {
         console.error("Error during authentication:", error);
@@ -87,6 +85,12 @@ function LoginForm() {
     } else setPasswordError(false);
     return error;
   }
+
+  useEffect(() => {
+    if (redirect) {
+      history.push("/");
+    }
+  }, [username]);
 
   return (
     <div className="chess-background">

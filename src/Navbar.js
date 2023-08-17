@@ -88,7 +88,7 @@ function MyNavbar() {
             {username ? (
               <>
                 <div>
-                  <NavLink>
+                  <NavLink href={"/profile/" + username}>
                     <FaUser size={22} />
                     {username}
                   </NavLink>

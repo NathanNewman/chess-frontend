@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Chess } from "chess.js";
-import { addConsecutiveNumbers, findMissingPieces } from "../helpers/chess.js";
+import { translateAlgebraicNotation } from "../helpers/chess.js";
 import { AuthContext } from "../helpers/AuthContext";
 import Chessboard from "./Chessboard";
 import ChessApi from "../helpers/api.js";
 import { useParams } from "react-router-dom";
+import { Button } from "reactstrap";
+import "../chess.css";
+import { FaStepForward, FaStepBackward } from "react-icons/fa";
+import { debounce } from 'lodash';
 
 function ReplayMatch() {
   // Initial FEN strings representing the starting position for white and black
@@ -15,37 +18,21 @@ function ReplayMatch() {
   // State to keep track of the chessboard and piece positions
   const [board, setBoard] = useState([]);
 
-  // FEN states
-  const [piecePlacement, setPiecePlacement] = useState("");
-  const [activeColor, setActiveColor] = useState("");
-  const [castlingAvailability, setCastlingAvailability] = useState("");
-  const [enPassantTarget, setEnPassantTarget] = useState("");
-  const [halfmoveClock, setHalfmoveClock] = useState("");
-  const [fullmoveNumber, setFullmoveNumber] = useState("");
-
   // Game states
   const [playerColor, setPlayerColor] = useState("white");
-  const [endingMessage, setEndingMessage] = useState("");
   const [moveHistory, setMoveHistory] = useState([]);
-  const { username, elo, setElo } = useContext(AuthContext);
-  const [piecesTaken, setPiecesTaken] = useState({});
-  const [errorMessage, setErrorMessage] = useState("");
+  const { username } = useContext(AuthContext);
   const { matchId } = useParams();
+  const [turn, setTurn] = useState(0);
+  const [boardHistory, setBoardHistory] = useState([]);
+
+  // added to fix error where user clicks faster than state update.
+  const debouncedClickForward = debounce(handleClickForward, 300);
+  const debouncedClickBackward = debounce(handleClickBack, 300);
 
   function parseFEN(fen) {
-    const [position, color, castlingEnPassant, dash, halfMove, fullMove] =
-      fen.split(" "); // Split FEN into position and additional info
+    const [position] = fen.split(" ");
     const rows = position.split("/");
-    const castling = castlingEnPassant.slice(0, 2);
-    const enPassant = castlingEnPassant.slice(2, 4);
-
-    // set FEN states
-    setPiecePlacement(position);
-    setActiveColor(color);
-    setCastlingAvailability(castling);
-    setEnPassantTarget(enPassant);
-    setHalfmoveClock(parseInt(halfMove) + 1);
-    setFullmoveNumber(parseInt(fullMove) + 1);
 
     return rows.map((row) => {
       let expandedRow = "";
@@ -71,33 +58,16 @@ function ReplayMatch() {
     });
   }
 
-  function boardToFEN(board) {
-    const fenRows = board.map((row) =>
-      row.map((piece) => (piece === null ? "1" : piece)).join("")
-    );
-    const addedFENRows = addConsecutiveNumbers(fenRows);
-    return (
-      addedFENRows.join("/") +
-      " " +
-      activeColor +
-      " " +
-      castlingAvailability +
-      enPassantTarget +
-      " - " +
-      halfmoveClock +
-      " " +
-      fullmoveNumber
-    );
-  }
-
   useEffect(() => {
     if (!username) return;
     // Set the initial board state with a random starting position
     setBoard(parseFEN(startingFEN));
+    setBoardHistory([parseFEN(startingFEN)]);
     const getReplays = async () => {
       try {
-        const data = await ChessApi.replayGame(matchId);
-        console.log(data);
+        const { match } = await ChessApi.replayGame(matchId);
+        setPlayerColor(match.user_color);
+        setMoveHistory(match.moves);
       } catch (error) {
         console.error("Error fetching replay data:", error);
       }
@@ -106,78 +76,81 @@ function ReplayMatch() {
     getReplays();
   }, []);
 
-  function handleMovePiece(fromSquare, toSquare) {
-    const chess = new Chess(); // Create a new chess instance
+  function handleClickForward() {
+    if (turn >= moveHistory.length) return;
 
-    // Load the board state using the current FEN
-    chess.load(boardToFEN(board));
+    const move = moveHistory[turn].notation;
+    if (move.length !== 4) return;
 
-    try {
-      // Check if the move is valid using chess.js move validation
-      const move = {
-        from: fromSquare,
-        to: toSquare,
-        promotion: "q", // Always promote to a queen for simplicity
-      };
+    const fromSquare = move.substring(0, 2);
+    const toSquare = move.substring(2, 4);
 
-      // If the moved piece is a pawn and it reached the last rank, set the promotion piece
-      if (
-        chess.get(fromSquare.row, fromSquare.col).type === "p" &&
-        (toSquare.row === 0 || toSquare.row === 7)
-      ) {
-        move.promotion = "q";
-      }
-      if (
-        chess.get(fromSquare.row, fromSquare.col).type === "P" &&
-        (toSquare.row === 0 || toSquare.row === 7)
-      ) {
-        move.promotion = "Q";
-      }
-      const updatedBoard = parseFEN(chess.fen()); // Get the updated FEN
-      setBoard(updatedBoard); // Update the board state
-      if (findMissingPieces(updatedBoard) !== piecesTaken) {
-        setPiecesTaken(findMissingPieces(updatedBoard));
-        setHalfmoveClock(0);
-      }
-      if (chess.isCheckmate()) {
-        if (playerColor[0] === activeColor) {
-          setEndingMessage("Checkmate! You win!");
-        } else {
-          setEndingMessage("Checkmate! You lose!");
-        }
-      } else if (chess.isStalemate()) {
-        if (playerColor[0] === activeColor) {
-          setEndingMessage("Stalemate! You win!");
-        } else {
-          setEndingMessage("Stalemate! You lose!");
-        }
-      } else if (halfmoveClock === 50) {
-        setEndingMessage("Draw! Game over.");
-      } else if (chess.isCheck()) {
-        setErrorMessage("Check!");
-        setTimeout(() => setErrorMessage(""), 5000);
-      }
-    } catch (error) {
-      // Handle any errors that occur during move validation
-      console.error("Error occurred during move validation:", error);
-      setErrorMessage("Invalid move, please try again.");
-      // Reset the error message after a short delay (e.g., 5 seconds)
-      setTimeout(() => setErrorMessage(""), 5000);
-    }
+    movePiece(fromSquare, toSquare);
+    setTurn(turn + 1);
   }
+
+  function movePiece(fromSquare, toSquare) {
+    const firstSquare = translateAlgebraicNotation(fromSquare);
+    const secondSquare = translateAlgebraicNotation(toSquare);
+  
+    const piece = board[firstSquare.row][firstSquare.col];
+    const updatedBoard = board.map(row => [...row]);
+  
+    updatedBoard[firstSquare.row][firstSquare.col] = "1";
+    updatedBoard[secondSquare.row][secondSquare.col] = piece;
+  
+    setBoard(updatedBoard);
+    setBoardHistory([...boardHistory, updatedBoard]);
+  }
+
+  function handleClickBack() {
+    if (turn === 0) return;
+    if (boardHistory.length < 1) return;
+    const previousTurn = turn - 1;
+    const previousBoard = boardHistory[previousTurn];
+    setBoard(previousBoard);
+    setTurn(previousTurn);
+  
+    setBoardHistory(boardHistory.slice(0, -1));
+  }
+
   return (
-    <div style={{ marginTop: "-30px" }}>
-      {activeColor === playerColor[0] ? (
-        <p>It's your turn!</p>
-      ) : (
-        <p>AI's turn!</p>
-      )}
-      <div className="chess-game-container">
-        <div className="chessboard-container">
+    <div
+      className="chess-background"
+      style={{ textAlign: "center", color: "white", paddingTop: "50px" }}
+    >
+      {console.log(boardHistory)}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "flex-start",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            marginRight: "100px",
+            marginTop: "150px",
+          }}
+        >
+          <Button
+            color="primary"
+            onClick={debouncedClickForward}
+            style={{ marginBottom: "30px" }}
+          >
+            Next Move <FaStepForward />
+          </Button>
+          <Button color="primary" onClick={debouncedClickBackward}>
+            Prev Move <FaStepBackward />
+          </Button>
+        </div>
+        <div className="chess-game-container">
           <Chessboard
             board={board}
             playerColor={playerColor}
-            errorMessage={errorMessage}
           />
         </div>
       </div>

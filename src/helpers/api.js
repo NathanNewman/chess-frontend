@@ -29,14 +29,12 @@ class ChessApi {
         {
           username: username,
           password: password,
-          imageURL: imageURL,
         },
         "post"
       );
       this.login(
         response.token,
         response.user.username,
-        response.user.imageURL,
         response.user.elo
       );
       return response;
@@ -59,7 +57,6 @@ class ChessApi {
       this.login(
         response.token,
         response.user.username,
-        response.user.imageURL,
         response.user.elo
       );
       return response;
@@ -79,22 +76,6 @@ class ChessApi {
     }
   }
 
-  static async updateUser(user) {
-    try {
-      const response = await this.request(
-        `users/${user.username}`,
-        {
-          imageURL: user.imageURL,
-        },
-        "patch"
-      );
-      return response;
-    } catch (error) {
-      console.error("API Error:", error);
-      throw error;
-    }
-  }
-
   static async deleteUser(username) {
     try {
       const response = await this.request(`users/${username}`, {}, "delete");
@@ -105,10 +86,9 @@ class ChessApi {
     }
   }
 
-  static login(token, username, imageURL, elo) {
+  static login(token, username, elo) {
     localStorage.setItem("authenticated", token);
     localStorage.setItem("username", username);
-    localStorage.setItem("imageURL", imageURL);
     localStorage.setItem("elo", elo);
     this.token = token;
     return token;
@@ -117,23 +97,25 @@ class ChessApi {
   static logout() {
     localStorage.removeItem("authenticated");
     localStorage.removeItem("username");
-    localStorage.removeItem("imageURL");
+    localStorage.removeItem("elo");
   }
 
-  static async recordGame(username, result, elo, moves, userColor) {
+  static async recordGame(username, result, elo, moves, playerColor) {
+    console.log(elo);
     try {
-      let response = await this.request(
+      let { user } = await this.request(
         "game/record",
         {
           username: username,
           result: result,
           elo: elo,
           moves: moves,
-          userColor: userColor,
+          userColor: playerColor,
         },
         "post"
       );
-      return response.user;
+      localStorage.setItem("elo", user.elo);
+      return user;
     } catch (error) {
       console.error("API Error:", error);
       throw error;
@@ -171,6 +153,19 @@ class ChessApi {
     try {
       const leaders = await this.request("users/leaderboard", {}, "get");
       return leaders;
+    } catch (error) {
+      console.error("API Error:", error);
+      throw error;
+    }
+  }
+  static async getWinLoss(username) {
+    try {
+      const response = await this.request(
+        `game/win-loss/${username}`,
+        {},
+        "get"
+      );
+      return response;
     } catch (error) {
       console.error("API Error:", error);
       throw error;

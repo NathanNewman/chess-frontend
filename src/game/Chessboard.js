@@ -9,16 +9,13 @@ function Chessboard({
   prevClickedSquare,
   handleClickedSquare,
 }) {
-  // Initial FEN strings representing the starting position for white and black
-  const startingFEN =
-    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
 
   // Function to render the chessboard with squares and pieces
   function renderBoard() {
     const rotatedBoard =
       playerColor === "black"
-        ? [...board].reverse()
-        : [...board].map((row) => [...row].reverse());
+        ? [...board].reverse().map((row => [...row].reverse()))
+        : [...board].map((row) => [...row]);
 
     return rotatedBoard.map((row, rowIndex) => (
       <div className="chessboard-row" key={rowIndex}>
