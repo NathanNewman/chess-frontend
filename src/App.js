@@ -9,54 +9,55 @@ import Replays from "./Replays";
 import ReplayMatch from "./game/ReplayMatch";
 import Profile from "./Profile";
 import { AuthContext } from "./helpers/AuthContext";
+import { HashRouter } from "react-router-dom/cjs/react-router-dom.min";
 
 function App() {
   const { authenticated } = useContext(AuthContext);
   return (
-    <BrowserRouter>
+    <>
       <MyNavbar />
       <main>
         <Route exact path="/">
           {authenticated || localStorage.getItem("authenticated") ? (
             <Home />
-          ) : (
-            <Redirect to="/login" />
-          )}
+            ) : (
+              <Redirect to="/login" />
+              )}
         </Route>
         <Route exact path="/play">
           {authenticated || localStorage.getItem("authenticated") ? (
             <Home />
-          ) : (
-            <Redirect to="/login" />
-          )}
+            ) : (
+              <Redirect to="/login" />
+              )}
         </Route>
         <Route exact path="/leaderboard">
           {authenticated || localStorage.getItem("authenticated") ? (
             <LeaderBoard />
-          ) : (
-            <Redirect to="/login" />
-          )}
+            ) : (
+              <Redirect to="/login" />
+              )}
         </Route>
         <Route exact path="/replays">
           {authenticated || localStorage.getItem("authenticated") ? (
             <Replays />
-          ) : (
-            <Redirect to="/login" />
-          )}
+            ) : (
+              <Redirect to="/login" />
+              )}
         </Route>
         <Route exact path="/replays/:matchId">
           {authenticated || localStorage.getItem("authenticated") ? (
             <ReplayMatch />
-          ) : (
-            <Redirect to="/login" />
-          )}
+            ) : (
+              <Redirect to="/login" />
+              )}
         </Route>
         <Route exact path="/profile/:username">
           {authenticated || localStorage.getItem("authenticated") ? (
             <Profile />
-          ) : (
-            <Redirect to="/login" />
-          )}
+            ) : (
+              <Redirect to="/login" />
+              )}
         </Route>
         <Route exact path="/signup">
           <SignUpForm />
@@ -65,7 +66,7 @@ function App() {
           <LoginForm />
         </Route>
       </main>
-    </BrowserRouter>
+              </>
   );
 }
 

@@ -3,10 +3,13 @@ import ReactDOM from "react-dom";
 import { AuthProvider } from "./helpers/AuthContext";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
+import { HashRouter } from "react-router-dom/cjs/react-router-dom.min";
 
 ReactDOM.render(
   <AuthProvider>
+    <HashRouter>
     <App />
+    </HashRouter>
   </AuthProvider>,
   document.getElementById("root")
 );

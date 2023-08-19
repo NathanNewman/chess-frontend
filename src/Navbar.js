@@ -4,9 +4,9 @@ import {
   NavbarBrand,
   Nav,
   NavItem,
-  NavLink,
   Container,
 } from "reactstrap";
+import { Link } from 'react-router-dom';
 import {
   FaTrophy,
   FaUserPlus,
@@ -36,7 +36,7 @@ function MyNavbar() {
         </NavbarBrand>
         <Nav className="mx-auto" navbar>
           <NavItem>
-            <NavLink href="/play">
+            <Link to="/play">
               {authenticated ? (
                 <>
                   <FaChessPawn size={22} />
@@ -50,10 +50,10 @@ function MyNavbar() {
                   </span>
                 </Tooltip>
               )}
-            </NavLink>
+            </Link>
           </NavItem>
           <NavItem>
-            <NavLink href="/leaderboard">
+            <Link to="/leaderboard">
               {authenticated ? (
                 <>
                   <FaTrophy size={22} /> Leaderboard
@@ -65,10 +65,10 @@ function MyNavbar() {
                   </span>
                 </Tooltip>
               )}
-            </NavLink>
+            </Link>
           </NavItem>
           <NavItem>
-            <NavLink href="/replays">
+            <Link to="/replays">
               {authenticated ? (
                 <>
                   <MdReplayCircleFilled size={22} /> Replays
@@ -80,7 +80,7 @@ function MyNavbar() {
                     </span>
                   </Tooltip>
               )}
-            </NavLink>
+            </Link>
           </NavItem>
         </Nav>
         <Nav className="ml-auto" navbar>
@@ -88,32 +88,32 @@ function MyNavbar() {
             {username ? (
               <>
                 <div>
-                  <NavLink href={"/profile/" + username}>
+                  <Link to={"/profile/" + username}>
                     <FaUser size={22} />
                     {username}
-                  </NavLink>
+                  </Link>
                 </div>
               </>
             ) : (
               <>
-                <NavLink href="/signup">
+                <Link to="/signup">
                   <FaUserPlus size={22} /> Signup
-                </NavLink>
+                </Link>
               </>
             )}
           </NavItem>
           <NavItem>
             {authenticated ? (
               <>
-                <NavLink href="/login" onClick={handleLogout}>
+                <Link to="/login" onClick={handleLogout}>
                   <FaSignOutAlt size={22} /> Logout
-                </NavLink>
+                </Link>
               </>
             ) : (
               <>
-                <NavLink href="/login">
+                <Link to="/login">
                   <FaSignInAlt size={22} /> Login
-                </NavLink>
+                </Link>
               </>
             )}
           </NavItem>
