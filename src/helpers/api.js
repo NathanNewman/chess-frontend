@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3001";
+// const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3001";
+let deployUrl="https://chess-backend-pcpc.onrender.com"
+const BASE_URL = deployUrl
 
 class ChessApi {
   static token;
