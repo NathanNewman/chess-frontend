@@ -105,7 +105,7 @@ function ChessGame() {
 
   function handleClickedSquare(rowIndex, colIndex) {
     if (gameOver) return;
-    let piece = board[rowIndex][colIndex];
+    let piece = board[rowIndex][7-colIndex];
     if (piece === "1") {
       setPrevClickedSquare(null);
     } else if (piece === piece.toUpperCase()) {
@@ -259,7 +259,6 @@ function ChessGame() {
           moveHistory,
           playerColor
         );
-        console.log(user);
         setElo(user.elo);
       }
       handleEndGame();
@@ -318,6 +317,7 @@ function ChessGame() {
       ) : (
         <p>AI's turn!</p>
       )}
+      {console.log(board)}
       <div className="chess-game-container">
         <div className="player-info">
           <GameInfoDisplay

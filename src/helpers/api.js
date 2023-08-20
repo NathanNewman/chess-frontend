@@ -103,7 +103,6 @@ class ChessApi {
   }
 
   static async recordGame(username, result, elo, moves, playerColor) {
-    console.log(elo);
     try {
       let { user } = await this.request(
         "game/record",

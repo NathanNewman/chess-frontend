@@ -125,7 +125,7 @@ export function totalMissingPieces(object) {
 }
 
 export function translateAlgebraicNotation(notation) {
-  const algebraicColumn = ["h", "g", "f", "e", "d", "c", "b", "a"];
+  const algebraicColumn = ["a", "b", "c", "d", "e", "f", "g", "h"];
   const algebraicRow = ["8", "7", "6", "5", "4", "3", "2", "1"];
 
   if (notation.length !== 2) {

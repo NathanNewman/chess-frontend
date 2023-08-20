@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { translateAlgebraicNotation } from "../helpers/chess.js";
 import { AuthContext } from "../helpers/AuthContext";
-import Chessboard from "./Chessboard";
+import Replayboard from "./Replayboard";
 import ChessApi from "../helpers/api.js";
 import { useParams } from "react-router-dom";
 import { Button } from "reactstrap";
@@ -120,6 +120,7 @@ function ReplayMatch() {
       style={{ textAlign: "center", color: "white", paddingTop: "50px" }}
     >
       {console.log(boardHistory)}
+      {console.log({playerColor})}
       <div
         style={{
           display: "flex",
@@ -148,7 +149,7 @@ function ReplayMatch() {
           </Button>
         </div>
         <div className="chess-game-container">
-          <Chessboard
+          <Replayboard
             board={board}
             playerColor={playerColor}
           />

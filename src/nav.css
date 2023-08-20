@@ -1,0 +1,58 @@
+.navbrand {
+  font-size: 18px;
+  color: black;
+  text-decoration: none;
+  margin: 5px 5px; /* Add space between links horizontally */
+  padding: 5px 10px; /* Add padding to the links for better clickability */
+}
+
+.navbrand:hover {
+  color: rgb(115, 115, 114); /* Change the color on hover */
+  text-decoration: none; /* Remove underline on hover */
+}
+
+.link-play {
+  color: black;
+  text-decoration: none;
+  margin: 5px 5px; /* Add space between links horizontally */
+  padding: 5px 10px; /* Add padding to the links for better clickability */
+}
+
+.link-play:hover {
+  color: rgb(115, 115, 114); /* Change the color on hover */
+  text-decoration: none; /* Remove underline on hover */
+}
+
+.link-leaderboard {
+  color: rgb(215, 174, 62);
+  text-decoration: none;
+  margin: 5px 5px; /* Add space between links horizontally */
+  padding: 5px 10px; /* Add padding to the links for better clickability */
+}
+
+.link-leaderboard:hover {
+  color: rgb(250, 223, 146); /* Change the color on hover */
+  text-decoration: none; /* Remove underline on hover */
+}
+
+.link-replays {
+  color: rgb(29, 91, 31);
+  text-decoration: none;
+  margin: 5px 5px; /* Add space between links horizontally */
+  padding: 5px 10px; /* Add padding to the links for better clickability */
+}
+
+.link-replays:hover {
+  color: rgb(69, 201, 73); /* Change the color on hover */
+  text-decoration: none; /* Remove underline on hover */
+}
+
+.link-user {
+  text-decoration: none;
+  margin: 5px 5px; /* Add space between links horizontally */
+  padding: 5px 10px; /* Add padding to the links for better clickability */
+}
+
+.link-user:hover {
+  text-decoration: none; /* Remove underline on hover */
+}

@@ -1,12 +1,6 @@
 import React, { useContext } from "react";
-import {
-  Navbar,
-  NavbarBrand,
-  Nav,
-  NavItem,
-  Container,
-} from "reactstrap";
-import { Link } from 'react-router-dom';
+import { Navbar, Nav, NavItem, Container } from "reactstrap";
+import { Link } from "react-router-dom";
 import {
   FaTrophy,
   FaUserPlus,
@@ -20,6 +14,7 @@ import { MdReplayCircleFilled } from "react-icons/md";
 import { Tooltip } from "@mui/material";
 import { AuthContext } from "./helpers/AuthContext";
 import ChessApi from "./helpers/api";
+import "./nav.css";
 
 function MyNavbar() {
   const { authenticated, setAuthenticated, username } = useContext(AuthContext);
@@ -31,12 +26,12 @@ function MyNavbar() {
   return (
     <Navbar color="light" light expand="md">
       <Container>
-        <NavbarBrand href="/">
+        <Link className="navbrand" to="/">
           <FaChess size={32} /> Chess
-        </NavbarBrand>
-        <Nav className="mx-auto" navbar>
+        </Link>
+        <Nav className="ml-auto" navbar>
           <NavItem>
-            <Link to="/play">
+            <Link className="link-play" to="/play">
               {authenticated ? (
                 <>
                   <FaChessPawn size={22} />
@@ -45,15 +40,15 @@ function MyNavbar() {
               ) : (
                 <Tooltip title="Login to access">
                   <span>
-                  <FaChessPawn size={22} />
-                  Play
+                    <FaChessPawn size={22} />
+                    Play
                   </span>
                 </Tooltip>
               )}
             </Link>
           </NavItem>
           <NavItem>
-            <Link to="/leaderboard">
+            <Link className="link-leaderboard" to="/leaderboard">
               {authenticated ? (
                 <>
                   <FaTrophy size={22} /> Leaderboard
@@ -61,24 +56,24 @@ function MyNavbar() {
               ) : (
                 <Tooltip title="Login to access">
                   <span>
-                  <FaTrophy size={22} /> Leaderboard
+                    <FaTrophy size={22} /> Leaderboard
                   </span>
                 </Tooltip>
               )}
             </Link>
           </NavItem>
           <NavItem>
-            <Link to="/replays">
+            <Link className="link-replays" to="/replays">
               {authenticated ? (
                 <>
                   <MdReplayCircleFilled size={22} /> Replays
                 </>
               ) : (
-                  <Tooltip title="Login to access">
-                    <span>
+                <Tooltip title="Login to access">
+                  <span>
                     <MdReplayCircleFilled size={22} /> Replays
-                    </span>
-                  </Tooltip>
+                  </span>
+                </Tooltip>
               )}
             </Link>
           </NavItem>
@@ -88,15 +83,17 @@ function MyNavbar() {
             {username ? (
               <>
                 <div>
-                  <Link to={"/profile/" + username}>
-                    <FaUser size={22} />
-                    {username}
-                  </Link>
+                  <Tooltip title="Profile">
+                    <Link className="link-user" to={"/profile/" + username}>
+                      <FaUser size={22} />
+                      {username}
+                    </Link>
+                  </Tooltip>
                 </div>
               </>
             ) : (
               <>
-                <Link to="/signup">
+                <Link className="link-user" to="/signup">
                   <FaUserPlus size={22} /> Signup
                 </Link>
               </>
@@ -105,13 +102,13 @@ function MyNavbar() {
           <NavItem>
             {authenticated ? (
               <>
-                <Link to="/login" onClick={handleLogout}>
+                <Link className="link-user" to="/login" onClick={handleLogout}>
                   <FaSignOutAlt size={22} /> Logout
                 </Link>
               </>
             ) : (
               <>
-                <Link to="/login">
+                <Link className="link-user" to="/login">
                   <FaSignInAlt size={22} /> Login
                 </Link>
               </>

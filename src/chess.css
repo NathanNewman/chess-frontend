@@ -16,11 +16,24 @@
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
+.replay-list-item:hover {
+  border-color: red;
+}
+
 .replay-info {
   font-weight: bold;
+}
+
+.replay-link:hover {
+  text-decoration: none;
 }
 
 .replay-result {
   margin-top: 5px;
   color: #6c757d;
+}
+
+.chess-piece {
+  width: 50px;
+  height: 50px;
 }

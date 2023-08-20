@@ -27,6 +27,7 @@ function Replays() {
       className="chess-background"
       style={{ textAlign: "center", paddingTop: "50px" }}
     >
+      {console.log(replays)}
       <div style={{ display: "flex", justifyContent: "center" }}>
         <div style={{ width: "500px" }}>
           <ListGroup>
@@ -37,9 +38,22 @@ function Replays() {
             </ListGroupItemHeading>
             {replays.length > 0 ? (
               replays.map((replay, index) => (
-                <Link to={`/replays/${replay.id}`} key={replay.id}>
+                <Link to={`/replays/${replay.id}`} key={replay.id} className="replay-link">
                   <ListGroupItem className="replay-list-item">
                     <div className="replay-info">
+                      {replay.user_color === "white" ? (
+                        <img
+                          src={require(`./game/pieces/K.png`)}
+                          alt={replay.user_color}
+                          className="chess-piece"
+                        />
+                      ) : (
+                        <img
+                          src={require(`./game/pieces/k.png`)}
+                          alt={replay.user_color}
+                          className="chess-piece"
+                        />
+                      )}
                       <b>Replay {index + 1}:</b> Match ID: {replay.id}{" "}
                       <span className="replay-result">
                         Result: {replay.result}
