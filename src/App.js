@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { BrowserRouter, Route, Redirect } from "react-router-dom";
+import { Route, Redirect } from "react-router-dom";
 import MyNavbar from "./Navbar";
 import Home from "./Home";
 import SignUpForm from "./SignUpForm";
