@@ -27,7 +27,6 @@ function Replays() {
       className="chess-background"
       style={{ textAlign: "center", paddingTop: "50px" }}
     >
-      {console.log(replays)}
       <div style={{ display: "flex", justifyContent: "center" }}>
         <div style={{ width: "500px" }}>
           <ListGroup>

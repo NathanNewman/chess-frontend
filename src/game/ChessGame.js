@@ -317,7 +317,6 @@ function ChessGame() {
       ) : (
         <p>AI's turn!</p>
       )}
-      {console.log(board)}
       <div className="chess-game-container">
         <div className="player-info">
           <GameInfoDisplay

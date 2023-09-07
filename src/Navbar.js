@@ -80,7 +80,7 @@ function MyNavbar() {
         </Nav>
         <Nav className="ml-auto" navbar>
           <NavItem>
-            {username ? (
+            {authenticated ? (
               <>
                 <div>
                   <Tooltip title="Profile">

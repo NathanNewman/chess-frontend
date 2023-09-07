@@ -9,7 +9,6 @@ import Replays from "./Replays";
 import ReplayMatch from "./game/ReplayMatch";
 import Profile from "./Profile";
 import { AuthContext } from "./helpers/AuthContext";
-import { HashRouter } from "react-router-dom/cjs/react-router-dom.min";
 
 function App() {
   const { authenticated } = useContext(AuthContext);

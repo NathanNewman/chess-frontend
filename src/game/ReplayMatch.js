@@ -119,8 +119,6 @@ function ReplayMatch() {
       className="chess-background"
       style={{ textAlign: "center", color: "white", paddingTop: "50px" }}
     >
-      {console.log(boardHistory)}
-      {console.log({playerColor})}
       <div
         style={{
           display: "flex",
@@ -158,5 +156,4 @@ function ReplayMatch() {
     </div>
   );
 }
-
 export default ReplayMatch;
