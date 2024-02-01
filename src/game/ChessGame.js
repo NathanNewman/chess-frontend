@@ -297,10 +297,6 @@ function ChessGame() {
     // Initialize Stockfish
     const stockfish = new Worker("/stockfish/stockfish.js");
 
-    stockfish.onmessage = (event) => {
-      const message = event.data;
-    };
-
     // Set the stockfishEngine state to the stockfish worker instance
     setStockfishEngine(stockfish);
 
